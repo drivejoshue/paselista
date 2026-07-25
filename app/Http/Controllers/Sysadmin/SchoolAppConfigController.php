@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\SysAdmin;
+namespace App\Http\Controllers\Sysadmin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SysAdmin\UpdateSchoolAppConfigRequest;
+use App\Http\Requests\Sysadmin\UpdateSchoolAppConfigRequest;
 use App\Models\School;
 use App\Services\SchoolAppConfigService;
 use Illuminate\Contracts\View\View;
