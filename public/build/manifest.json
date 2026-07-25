@@ -1,0 +1,41 @@
+{
+  "_browser-BeMEBtOm.js": {
+    "file": "assets/browser-BeMEBtOm.js",
+    "name": "browser"
+  },
+  "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.ttf": {
+    "file": "assets/tabler-icons-DSK2_1ka.ttf",
+    "src": "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.ttf"
+  },
+  "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.woff": {
+    "file": "assets/tabler-icons-KWc1JFMo.woff",
+    "src": "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.woff"
+  },
+  "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.woff2": {
+    "file": "assets/tabler-icons-CKaxJfX3.woff2",
+    "src": "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-DxEPyCP5.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-B0WXKGq8.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_browser-BeMEBtOm.js"
+    ]
+  },
+  "resources/js/guardian-credential.js": {
+    "file": "assets/guardian-credential-BFllnW6g.js",
+    "name": "guardian-credential",
+    "src": "resources/js/guardian-credential.js",
+    "isEntry": true,
+    "imports": [
+      "_browser-BeMEBtOm.js"
+    ]
+  }
+}
