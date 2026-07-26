@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'brand' => env('SCHOOLPASS_PUBLIC_BRAND', 'SchoolPass'),
+    'brand' => env('SCHOOLPASS_PUBLIC_BRAND', 'PaseLista'),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,17 +25,17 @@ return [
 
     'privacy_email' => env(
         'SCHOOLPASS_PUBLIC_PRIVACY_EMAIL',
-        'privacidad@schoolpass.mx'
+        'soporte@sysapp.com.mx'
     ),
 
     'support_email' => env(
         'SCHOOLPASS_PUBLIC_SUPPORT_EMAIL',
-        'soporte@schoolpass.mx'
+        'soporte@sysapp.com.mx'
     ),
 
     'commercial_email' => env(
         'SCHOOLPASS_PUBLIC_COMMERCIAL_EMAIL',
-        'contacto@schoolpass.mx'
+        'soporte@sysapp.com.mx'
     ),
 
     'phone' => env('SCHOOLPASS_PUBLIC_PHONE'),
@@ -54,6 +54,6 @@ return [
      */
     'privacy_notification_email' => env(
         'SCHOOLPASS_PRIVACY_NOTIFICATION_EMAIL',
-        env('SCHOOLPASS_PUBLIC_PRIVACY_EMAIL', 'privacidad@schoolpass.mx')
+        env('SCHOOLPASS_PUBLIC_PRIVACY_EMAIL', 'soporte@sysapp.com.mx')
     ),
 ];
