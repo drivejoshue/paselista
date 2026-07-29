@@ -14,20 +14,52 @@ class AccessScanController extends Controller
     ) {
     }
 
-    public function scan(Request $request): JsonResponse
-    {
+    public function scan(
+        Request $request
+    ): JsonResponse {
         $data = $request->validate([
-            'token' => ['required', 'string', 'max:255'],
-            'device_uuid' => ['required', 'string', 'max:120'],
-            'event_type' => ['nullable', 'in:entry,exit,access'],
-            'scanned_at' => ['nullable', 'date'],
+            'token' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'device_uuid' => [
+                'required',
+                'string',
+                'max:120',
+            ],
+
+            'event_type' => [
+                'nullable',
+                'in:entry,exit,access',
+            ],
+
+            'reader_type' => [
+                'nullable',
+                'in:camera_qr,hardware,nfc,manual',
+            ],
+
+            'scanned_at' => [
+                'nullable',
+                'date',
+            ],
         ]);
 
-        $result = $this->accessScanService->process($data, $request->user());
+        $result = $this->accessScanService->process(
+            $data,
+            $request->user()
+        );
 
         $httpCode = $result['http_code'] ?? 200;
-        unset($result['http_code']);
 
-        return response()->json($result, $httpCode);
+        unset(
+            $result['http_code']
+        );
+
+        return response()->json(
+            $result,
+            $httpCode
+        );
     }
 }

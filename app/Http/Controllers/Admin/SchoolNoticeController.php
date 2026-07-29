@@ -53,6 +53,386 @@ class SchoolNoticeController extends Controller
         ]);
     }
 
+
+    public function show(
+    Request $request,
+    int $notice
+): View {
+    $user = $this->adminUserOrFail(
+        $request
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Aviso
+    |--------------------------------------------------------------------------
+    */
+
+    $row = DB::table('school_notices')
+        ->where('id', $notice)
+        ->where(
+            'school_id',
+            $user->school_id
+        )
+        ->first();
+
+    if (! $row) {
+        throw new AuthorizationException(
+            'Aviso no disponible.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Alcance configurado
+    |--------------------------------------------------------------------------
+    */
+
+    $targets = DB::table(
+        'school_notice_targets'
+    )
+        ->where(
+            'school_id',
+            $user->school_id
+        )
+        ->where(
+            'school_notice_id',
+            $notice
+        )
+        ->get();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Destinatarios reales
+    |--------------------------------------------------------------------------
+    |
+    | notifications funciona como snapshot del momento en que se publicó.
+    | No recalculamos destinatarios usando los tutores actuales.
+    |
+    */
+
+    $recipientBase = DB::table(
+        'notifications as n'
+    )
+        ->where(
+            'n.school_id',
+            $user->school_id
+        )
+        ->where(
+            'n.reference_type',
+            'school_notice'
+        )
+        ->where(
+            'n.reference_id',
+            $notice
+        );
+
+    $recipientCount = (
+        clone $recipientBase
+    )->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lecturas
+    |--------------------------------------------------------------------------
+    */
+
+    $readsBase = DB::table(
+        'school_notice_reads'
+    )
+        ->where(
+            'school_id',
+            $user->school_id
+        )
+        ->where(
+            'school_notice_id',
+            $notice
+        );
+
+    $readCount = (
+        clone $readsBase
+    )
+        ->whereNotNull('read_at')
+        ->count();
+
+    $acknowledgedCount = (
+        clone $readsBase
+    )
+        ->whereNotNull(
+            'acknowledged_at'
+        )
+        ->count();
+
+    $unreadCount = max(
+        0,
+        $recipientCount - $readCount
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Entrega push
+    |--------------------------------------------------------------------------
+    */
+
+    $pushSentCount = (
+        clone $recipientBase
+    )
+        ->where(
+            'n.push_status',
+            'sent'
+        )
+        ->count();
+
+    $noDeviceCount = (
+        clone $recipientBase
+    )
+        ->where(
+            'n.push_status',
+            'no_devices'
+        )
+        ->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filtros del detalle
+    |--------------------------------------------------------------------------
+    */
+
+    $state = trim(
+        (string) $request->query(
+            'state',
+            ''
+        )
+    );
+
+    $search = trim(
+        (string) $request->query(
+            'q',
+            ''
+        )
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tabla de seguimiento
+    |--------------------------------------------------------------------------
+    */
+
+    $recipients = DB::table(
+        'notifications as n'
+    )
+        ->leftJoin(
+            'guardians as g',
+            'g.id',
+            '=',
+            'n.guardian_id'
+        )
+        ->leftJoin(
+            'school_notice_reads as r',
+            function ($join): void {
+                $join
+                    ->on(
+                        'r.school_notice_id',
+                        '=',
+                        'n.reference_id'
+                    )
+                    ->on(
+                        'r.user_id',
+                        '=',
+                        'n.user_id'
+                    );
+            }
+        )
+        ->where(
+            'n.school_id',
+            $user->school_id
+        )
+        ->where(
+            'n.reference_type',
+            'school_notice'
+        )
+        ->where(
+            'n.reference_id',
+            $notice
+        )
+
+        /*
+         * Buscar tutor.
+         */
+        ->when(
+            $search !== '',
+            function ($query) use (
+                $search
+            ): void {
+                $query->where(
+                    function ($sub) use (
+                        $search
+                    ): void {
+                        $sub
+                            ->where(
+                                'g.first_name',
+                                'like',
+                                "%{$search}%"
+                            )
+                            ->orWhere(
+                                'g.last_name',
+                                'like',
+                                "%{$search}%"
+                            )
+                            ->orWhere(
+                                'g.email',
+                                'like',
+                                "%{$search}%"
+                            )
+                            ->orWhere(
+                                'g.phone',
+                                'like',
+                                "%{$search}%"
+                            );
+                    }
+                );
+            }
+        )
+
+        /*
+         * Estado.
+         */
+        ->when(
+            $state === 'read',
+            fn ($query) =>
+                $query->whereNotNull(
+                    'r.read_at'
+                )
+        )
+        ->when(
+            $state === 'unread',
+            fn ($query) =>
+                $query->whereNull(
+                    'r.read_at'
+                )
+        )
+        ->when(
+            $state === 'acknowledged',
+            fn ($query) =>
+                $query->whereNotNull(
+                    'r.acknowledged_at'
+                )
+        )
+        ->when(
+            $state === 'pending_ack',
+            fn ($query) =>
+                $query
+                    ->whereNotNull(
+                        'r.read_at'
+                    )
+                    ->whereNull(
+                        'r.acknowledged_at'
+                    )
+        )
+
+        ->select([
+            'n.id as notification_id',
+            'n.user_id',
+            'n.guardian_id',
+
+            'n.status as notification_status',
+            'n.push_status',
+            'n.push_sent_at',
+            'n.push_error_code',
+
+            'g.first_name',
+            'g.last_name',
+            'g.email',
+            'g.phone',
+
+            'r.read_at',
+            'r.acknowledged_at',
+        ])
+
+        ->orderByRaw(
+            'CASE
+                WHEN r.acknowledged_at IS NOT NULL THEN 1
+                WHEN r.read_at IS NOT NULL THEN 2
+                ELSE 3
+            END'
+        )
+        ->orderBy('g.first_name')
+        ->orderBy('g.last_name')
+        ->paginate(50)
+        ->withQueryString();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resumen
+    |--------------------------------------------------------------------------
+    */
+
+    $stats = [
+        'recipients' =>
+            $recipientCount,
+
+        'read' =>
+            $readCount,
+
+        'unread' =>
+            $unreadCount,
+
+        'acknowledged' =>
+            $acknowledgedCount,
+
+        'push_sent' =>
+            $pushSentCount,
+
+        'no_devices' =>
+            $noDeviceCount,
+
+        'read_percentage' =>
+            $recipientCount > 0
+                ? round(
+                    (
+                        $readCount
+                        / $recipientCount
+                    ) * 100,
+                    1
+                )
+                : 0,
+
+        'ack_percentage' =>
+            $recipientCount > 0
+                ? round(
+                    (
+                        $acknowledgedCount
+                        / $recipientCount
+                    ) * 100,
+                    1
+                )
+                : 0,
+    ];
+
+    return view(
+        'admin.notices.show',
+        [
+            'notice' =>
+                $row,
+
+            'targets' =>
+                $targets,
+
+            'stats' =>
+                $stats,
+
+            'recipients' =>
+                $recipients,
+
+            'state' =>
+                $state,
+
+            'search' =>
+                $search,
+        ]
+    );
+}
+
     public function create(Request $request): View
     {
         $user = $this->adminUserOrFail($request);

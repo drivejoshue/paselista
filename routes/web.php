@@ -1108,10 +1108,20 @@ Route::prefix('cycles')
             [SchoolNoticeController::class, 'index']
         )->name('notices.index');
 
+
+
         Route::get(
             '/notices/create',
             [SchoolNoticeController::class, 'create']
         )->name('notices.create');
+
+        Route::get(
+    '/notices/{notice}',
+    [SchoolNoticeController::class, 'show']
+)
+    ->whereNumber('notice')
+    ->name('notices.show');
+
 
         Route::post(
             '/notices',
@@ -1246,8 +1256,7 @@ Route::post(
 
 
 
-
-\Illuminate\Support\Facades\Route::get(
+Route::get(
     '/home',
     function (\Illuminate\Http\Request $request) {
         $role = (string) (
@@ -1255,27 +1264,33 @@ Route::post(
             ?? ''
         );
 
-        $destination = match ($role) {
-            'superadmin' => '/sysadmin/dashboard',
+        return match ($role) {
+            'superadmin' => redirect()
+                ->route('sysadmin.dashboard'),
 
-             'director' => '/admin/dashboard',
-               'director' => '/admin/dashboard',
+            'school_admin',
+            'director' => redirect()
+                ->route('admin.dashboard'),
 
-            'prefect' => '/prefect',
-            'kiosk' => '/kiosk',
-            'guardian' => '/family',
+            'kiosk' => redirect()
+                ->route('kiosk.access'),
 
-            default => '/',
+            'guardian' => redirect()
+                ->route('guardian.home'),
+
+            'student' => redirect()
+                ->route('student.home'),
+
+            'prefect' => redirect()
+                ->to('/prefect'),
+
+            default => redirect()
+                ->route('public.home'),
         };
-
-        return redirect()->to(
-            url($destination)
-        );
     }
 )
     ->middleware('auth')
     ->name('home');
-
 
 
 

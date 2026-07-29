@@ -229,7 +229,7 @@
                     href="{{ route('sysadmin.dashboard') }}"
                     class="text-decoration-none d-flex align-items-center gap-2"
                 >
-                    <span class="sp-brand-mark">SP</span>
+                    <span class="sp-brand-mark">PL</span>
 
                     <span class="text-start">
                         <span class="d-block fw-bold">PaseLista</span>

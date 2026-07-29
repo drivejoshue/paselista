@@ -9,6 +9,37 @@
     $lightTheme = $theme['light'];
     $darkTheme = $theme['dark'];
 
+/*
+    |--------------------------------------------------------------------------
+    | Recursos visuales para el panel web
+    |--------------------------------------------------------------------------
+    |
+    | En la configuración guardamos únicamente el path:
+    |
+    | schools/{school}/app-branding/archivo.jpg
+    |
+    | La API móvil puede seguir convirtiendo ese path a una URL absoluta
+    | usando APP_URL. Para el panel Sysadmin usamos una ruta relativa para
+    | que funcione tanto desde localhost como desde el dominio público.
+    |
+    */
+
+    $logoPreviewUrl = !empty($identity['logo_path'])
+        ? '/storage/'.ltrim(
+            (string) $identity['logo_path'],
+            '/'
+        )
+        : null;
+
+    $welcomeImagePreviewUrl = !empty(
+        $identity['welcome_image_path']
+    )
+        ? '/storage/'.ltrim(
+            (string) $identity['welcome_image_path'],
+            '/'
+        )
+        : null;
+        
     $attendance = $config['attendance'];
     $credentials = $config['credentials'];
     $notifications = $config['notifications'];
@@ -195,7 +226,7 @@
 
             <div class="text-secondary mt-1">
                 Marca, tema, operación y funciones entregadas
-                dinámicamente a SchoolPass Staff y Familia.
+                dinámicamente a PaseLista Staff y Familia.
             </div>
         </div>
 
@@ -943,35 +974,43 @@
                                 Preferible con fondo transparente.
                             </div>
 
-                            @if ($logoUrl)
-                                <div class="mt-3">
-                                    <div class="border rounded p-3 bg-white text-center">
-                                        <img
-                                            src="{{ $logoUrl }}"
-                                            alt="Logotipo actual"
-                                            style="
-                                                max-height: 100px;
-                                                max-width: 230px;
-                                                object-fit: contain;
-                                            "
-                                        >
-                                    </div>
+                            @if ($logoPreviewUrl)
+    <div class="mt-3">
+        <div
+            class="
+                border
+                rounded
+                p-3
+                bg-white
+                text-center
+            "
+        >
+            <img
+                src="{{ $logoPreviewUrl }}"
+                alt="Logotipo actual"
+                style="
+                    max-height: 100px;
+                    max-width: 230px;
+                    object-fit: contain;
+                "
+            >
+        </div>
 
-                                    <label class="form-check mt-2">
-                                        <input
-                                            type="checkbox"
-                                            name="remove_logo"
-                                            value="1"
-                                            class="form-check-input"
-                                            @checked(old('remove_logo'))
-                                        >
+        <label class="form-check mt-2">
+            <input
+                type="checkbox"
+                name="remove_logo"
+                value="1"
+                class="form-check-input"
+                @checked(old('remove_logo'))
+            >
 
-                                        <span class="form-check-label">
-                                            Eliminar logotipo actual
-                                        </span>
-                                    </label>
-                                </div>
-                            @endif
+            <span class="form-check-label">
+                Eliminar logotipo actual
+            </span>
+        </label>
+    </div>
+@endif
                         </div>
 
                         <div class="col-md-6">
@@ -998,37 +1037,43 @@
                                 Máximo 6 MB.
                             </div>
 
-                            @if ($welcomeImageUrl)
-                                <div class="mt-3">
-                                    <div class="border rounded overflow-hidden">
-                                        <img
-                                            src="{{ $welcomeImageUrl }}"
-                                            alt="Imagen de bienvenida actual"
-                                            style="
-                                                width: 100%;
-                                                max-height: 160px;
-                                                object-fit: cover;
-                                            "
-                                        >
-                                    </div>
+                            @if ($welcomeImagePreviewUrl)
+    <div class="mt-3">
+        <div
+            class="
+                border
+                rounded
+                overflow-hidden
+            "
+        >
+            <img
+                src="{{ $welcomeImagePreviewUrl }}"
+                alt="Imagen de bienvenida actual"
+                style="
+                    width: 100%;
+                    max-height: 160px;
+                    object-fit: cover;
+                "
+            >
+        </div>
 
-                                    <label class="form-check mt-2">
-                                        <input
-                                            type="checkbox"
-                                            name="remove_welcome_image"
-                                            value="1"
-                                            class="form-check-input"
-                                            @checked(old(
-                                                'remove_welcome_image'
-                                            ))
-                                        >
+        <label class="form-check mt-2">
+            <input
+                type="checkbox"
+                name="remove_welcome_image"
+                value="1"
+                class="form-check-input"
+                @checked(old(
+                    'remove_welcome_image'
+                ))
+            >
 
-                                        <span class="form-check-label">
-                                            Eliminar imagen actual
-                                        </span>
-                                    </label>
-                                </div>
-                            @endif
+            <span class="form-check-label">
+                Eliminar imagen actual
+            </span>
+        </label>
+    </div>
+@endif
                         </div>
                     </div>
                 </div>
@@ -1282,7 +1327,7 @@
                 <div class="card-header">
                     <div>
                         <h3 class="card-title">
-                            SchoolPass Staff
+                            PaseLista Staff
                         </h3>
 
                         <div class="small text-secondary">
@@ -1529,43 +1574,50 @@
                             >
                                 <div class="d-flex align-items-center gap-3">
                                     <div
-                                        class="rounded-3 border d-flex align-items-center justify-content-center bg-white"
-                                        style="
-                                            width: 64px;
-                                            height: 64px;
-                                            flex: 0 0 64px;
-                                            overflow: hidden;
-                                        "
-                                    >
-                                        <img
-                                            id="preview-logo"
-                                            src="{{ $logoUrl ?: '' }}"
-                                            alt=""
-                                            style="
-                                                max-width: 54px;
-                                                max-height: 54px;
-                                                object-fit: contain;
-                                                display: {{
-                                                    $logoUrl
-                                                        ? 'block'
-                                                        : 'none'
-                                                }};
-                                            "
-                                        >
+    class="
+        rounded-3
+        border
+        d-flex
+        align-items-center
+        justify-content-center
+        bg-white
+    "
+    style="
+        width: 64px;
+        height: 64px;
+        flex: 0 0 64px;
+        overflow: hidden;
+    "
+>
+    <img
+        id="preview-logo"
+        src="{{ $logoPreviewUrl ?: '' }}"
+        alt=""
+        style="
+            max-width: 54px;
+            max-height: 54px;
+            object-fit: contain;
+            display: {{
+                $logoPreviewUrl
+                    ? 'block'
+                    : 'none'
+            }};
+        "
+    >
 
-                                        <i
-                                            id="preview-logo-fallback"
-                                            class="ti ti-school fs-1"
-                                            style="
-                                                color: var(--preview-primary);
-                                                display: {{
-                                                    $logoUrl
-                                                        ? 'none'
-                                                        : 'block'
-                                                }};
-                                            "
-                                        ></i>
-                                    </div>
+    <i
+        id="preview-logo-fallback"
+        class="ti ti-school fs-1"
+        style="
+            color: var(--preview-primary);
+            display: {{
+                $logoPreviewUrl
+                    ? 'none'
+                    : 'block'
+            }};
+        "
+    ></i>
+</div>
 
                                     <div class="min-width-0">
                                         <div
@@ -1936,7 +1988,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ) {
             previewAppName.textContent =
                 appNameInput.value.trim()
-                || 'SchoolPass';
+                || 'PaseLista';
         }
 
         if (
@@ -1954,7 +2006,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ) {
             previewWelcomeMessage.textContent =
                 welcomeMessageInput.value.trim()
-                || 'Bienvenido a SchoolPass';
+                || 'Bienvenido a PaseLista';
         }
     }
 

@@ -1,20 +1,35 @@
+
 @php
+    use Illuminate\Support\Facades\Route;
+
     $user = auth()->user();
-    $role = $user?->role;
+    $role = (string) ($user?->role ?? '');
 
-    $policy = app(
-        \App\Services\Authorization\SchoolRolePolicy::class
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | Roles de PaseLista V1
+    |--------------------------------------------------------------------------
+    |
+    | Director:
+    |   Opera la escuela: alumnos, tutores, ciclos, asistencia, accesos,
+    |   reportes, avisos, IA e importaciones.
+    |
+    | School Admin:
+    |   Tiene además administración técnica: usuarios, dispositivos,
+    |   permisos, herramientas y licencia.
+    |
+    */
 
-    $isAdministrativeRole = in_array(
-        $role,
-        [
-            'superadmin',
-            'school_admin',
-            'director',
-        ],
-        true
-    );
+    $schoolManagementRoles = [
+        'superadmin',
+        'school_admin',
+        'director',
+    ];
+
+    $platformAdminRoles = [
+        'superadmin',
+        'school_admin',
+    ];
 
     $sectionLabelClass =
         'px-3 pt-3 pb-1 text-uppercase text-secondary fw-bold';
@@ -26,16 +41,19 @@
 
     /*
     |--------------------------------------------------------------------------
-    | Administración escolar y dirección
+    | Administración escolar / Dirección
     |--------------------------------------------------------------------------
-    |
-    | La visibilidad de cada ruta administrativa se resuelve con
-    | SchoolRolePolicy. El director ya no depende de manage_only.
-    |
     */
 
-    if ($isAdministrativeRole) {
+    if (in_array($role, $schoolManagementRoles, true)) {
         $sections = [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Inicio
+            |--------------------------------------------------------------------------
+            */
+
             [
                 'label' => 'Inicio',
 
@@ -49,9 +67,17 @@
                         ],
 
                         'icon' => 'ti-layout-dashboard',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Operación diaria
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Operación diaria',
@@ -66,6 +92,8 @@
                         ],
 
                         'icon' => 'ti-scan',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -77,6 +105,8 @@
                         ],
 
                         'icon' => 'ti-device-desktop',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -88,6 +118,8 @@
                         ],
 
                         'icon' => 'ti-calendar-check',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -99,9 +131,17 @@
                         ],
 
                         'icon' => 'ti-device-desktop-analytics',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Alumnos y familias
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Alumnos y familias',
@@ -116,6 +156,8 @@
                         ],
 
                         'icon' => 'ti-users',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -127,6 +169,8 @@
                         ],
 
                         'icon' => 'ti-user-heart',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -138,6 +182,8 @@
                         ],
 
                         'icon' => 'ti-id-badge-2',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -149,9 +195,17 @@
                         ],
 
                         'icon' => 'ti-speakerphone',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ciclo y organización
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Ciclo y organización',
@@ -167,6 +221,8 @@
                         ],
 
                         'icon' => 'ti-calendar-stats',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -178,6 +234,8 @@
                         ],
 
                         'icon' => 'ti-users-group',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -189,6 +247,8 @@
                         ],
 
                         'icon' => 'ti-calendar-event',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -201,9 +261,17 @@
                         ],
 
                         'icon' => 'ti-arrow-big-up-lines',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Control de acceso
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Control de acceso',
@@ -218,6 +286,8 @@
                         ],
 
                         'icon' => 'ti-map-pin',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -229,7 +299,15 @@
                         ],
 
                         'icon' => 'ti-shield-check',
+
+                        'roles' => $schoolManagementRoles,
                     ],
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Solo administración técnica
+                    |--------------------------------------------------------------------------
+                    */
 
                     [
                         'title' => 'Dispositivos',
@@ -240,6 +318,8 @@
                         ],
 
                         'icon' => 'ti-device-tablet',
+
+                        'roles' => $platformAdminRoles,
                     ],
 
                     [
@@ -251,6 +331,8 @@
                         ],
 
                         'icon' => 'ti-users-cog',
+
+                        'roles' => $platformAdminRoles,
                     ],
 
                     [
@@ -262,9 +344,17 @@
                         ],
 
                         'icon' => 'ti-door-enter',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reportes y seguimiento
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Reportes y seguimiento',
@@ -280,6 +370,8 @@
                         ],
 
                         'icon' => 'ti-calendar-month',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -292,6 +384,8 @@
                         ],
 
                         'icon' => 'ti-user-search',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -304,6 +398,8 @@
                         ],
 
                         'icon' => 'ti-alert-triangle',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -316,6 +412,8 @@
                         ],
 
                         'icon' => 'ti-chart-histogram',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -328,6 +426,8 @@
                         ],
 
                         'icon' => 'ti-file-export',
+
+                        'roles' => $schoolManagementRoles,
                     ],
 
                     [
@@ -340,9 +440,17 @@
                         ],
 
                         'icon' => 'ti-file-check',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Inteligencia artificial
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Inteligencia artificial',
@@ -357,14 +465,28 @@
                         ],
 
                         'icon' => 'ti-brain',
+
+                        'roles' => $schoolManagementRoles,
                     ],
                 ],
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Administración escolar
+            |--------------------------------------------------------------------------
+            */
 
             [
                 'label' => 'Administración',
 
                 'items' => [
+                    /*
+                    |--------------------------------------------------------------------------
+                    | El director sí puede importar alumnos.
+                    |--------------------------------------------------------------------------
+                    */
+
                     [
                         'title' => 'Importar alumnos',
                         'route' =>
@@ -375,7 +497,15 @@
                         ],
 
                         'icon' => 'ti-file-import',
+
+                        'roles' => $schoolManagementRoles,
                     ],
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Funciones exclusivas de administración de plataforma
+                    |--------------------------------------------------------------------------
+                    */
 
                     [
                         'title' => 'Permisos por rol',
@@ -386,16 +516,9 @@
                             'admin.role-permissions.*',
                         ],
 
-                        'icon' => 'ti-shield-check',
+                        'icon' => 'ti-shield-lock',
 
-                        /*
-                         * Esta ruta está registrada solo para
-                         * school_admin y director.
-                         */
-                        'roles' => [
-                            'school_admin',
-                            'director',
-                        ],
+                        'roles' => $platformAdminRoles,
                     ],
 
                     [
@@ -406,7 +529,9 @@
                             'admin.tools.*',
                         ],
 
-                        'icon' => 'ti-tool',
+                        'icon' => 'ti-settings',
+
+                        'roles' => $platformAdminRoles,
                     ],
 
                     [
@@ -418,6 +543,8 @@
                         ],
 
                         'icon' => 'ti-license',
+
+                        'roles' => $platformAdminRoles,
                     ],
                 ],
             ],
@@ -445,6 +572,10 @@
                         ],
 
                         'icon' => 'ti-scan',
+
+                        'roles' => [
+                            'prefect',
+                        ],
                     ],
                 ],
             ],
@@ -472,6 +603,10 @@
                         ],
 
                         'icon' => 'ti-user-heart',
+
+                        'roles' => [
+                            'guardian',
+                        ],
                     ],
                 ],
             ],
@@ -499,6 +634,10 @@
                         ],
 
                         'icon' => 'ti-id-badge',
+
+                        'roles' => [
+                            'student',
+                        ],
                     ],
                 ],
             ],
@@ -526,6 +665,10 @@
                         ],
 
                         'icon' => 'ti-device-desktop',
+
+                        'roles' => [
+                            'kiosk',
+                        ],
                     ],
                 ],
             ],
@@ -538,36 +681,46 @@
 >
     <div class="container-fluid">
 
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sidebar-menu"
-            aria-controls="sidebar-menu"
-            aria-expanded="false"
-            aria-label="Abrir menú"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <button
+    class="navbar-toggler"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#sidebar-menu"
+    aria-controls="sidebar-menu"
+    aria-expanded="false"
+    aria-label="Abrir menú"
+>
+    <span class="navbar-toggler-icon"></span>
+</button>
 
-        <h1 class="navbar-brand navbar-brand-autodark">
-            <a
-                href="{{ route('home') }}"
-                class="text-decoration-none"
+<h1 class="navbar-brand navbar-brand-autodark">
+    <a
+        href="{{ route('home') }}"
+        class="text-decoration-none"
+    >
+        <span class="d-flex align-items-center gap-2">
+
+            {{-- Logo para tema claro --}}
+            <img
+                src="{{ asset('images/ic_logo.png') }}"
+                alt="PaseLista"
+                class="sp-brand-logo sp-brand-logo-light"
             >
-                <span class="d-flex align-items-center gap-2">
 
-                    <span class="avatar avatar-sm bg-primary text-white">
-                        <i class="ti ti-shield-lock"></i>
-                    </span>
+            {{-- Logo para tema oscuro --}}
+            <img
+                src="{{ asset('images/logo.png') }}"
+                alt="PaseLista"
+                class="sp-brand-logo sp-brand-logo-dark"
+            >
 
-                    <span>
-                        PaseLista
-                    </span>
+            <span class="fw-semibold sp-brand-name">
+                PaseLista
+            </span>
 
-                </span>
-            </a>
-        </h1>
+        </span>
+    </a>
+</h1>
 
         <div
             class="collapse navbar-collapse"
@@ -577,6 +730,13 @@
 
                 @foreach($sections as $section)
                     @php
+                        /*
+                         * La sidebar decide únicamente qué enlaces mostrar.
+                         *
+                         * La autorización real continúa en middleware,
+                         * policies y controladores.
+                         */
+
                         $visibleItems = collect(
                             $section['items']
                         )
@@ -584,15 +744,13 @@
                                 function (
                                     array $item
                                 ) use (
-                                    $policy,
                                     $role
                                 ): bool {
                                     /*
-                                     * No dibuja enlaces de rutas
-                                     * que todavía no existan.
+                                     * Nunca mostrar rutas inexistentes.
                                      */
                                     if (
-                                        ! \Illuminate\Support\Facades\Route::has(
+                                        ! Route::has(
                                             $item['route']
                                         )
                                     ) {
@@ -600,8 +758,8 @@
                                     }
 
                                     /*
-                                     * Restricción adicional de un
-                                     * elemento concreto.
+                                     * Cada elemento define explícitamente
+                                     * qué roles pueden verlo.
                                      */
                                     if (
                                         isset($item['roles'])
@@ -614,35 +772,14 @@
                                         return false;
                                     }
 
-                                    /*
-                                     * Las rutas ajenas al prefijo admin
-                                     * conservan su visibilidad por rol.
-                                     */
-                                    if (
-                                        ! str_starts_with(
-                                            $item['route'],
-                                            'admin.'
-                                        )
-                                    ) {
-                                        return true;
-                                    }
-
-                                    /*
-                                     * Las rutas administrativas usan la
-                                     * misma política que RoleMiddleware.
-                                     */
-                                    return $policy->allowsRoute(
-                                        role: (string) $role,
-                                        routeName:
-                                            $item['route'],
-                                        method: 'GET'
-                                    );
+                                    return true;
                                 }
                             )
                             ->values();
                     @endphp
 
                     @if($visibleItems->isNotEmpty())
+
                         <li
                             class="{{ $sectionLabelClass }}"
                             style="{{ $sectionLabelStyle }}"
@@ -672,12 +809,24 @@
                                             ? 'active'
                                             : ''
                                     }}"
-                                    href="{{ route(
-                                        $item['route']
-                                    ) }}"
+                                    href="{{
+                                        route(
+                                            $item['route']
+                                        )
+                                    }}"
                                 >
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <i class="ti {{ $item['icon'] }}"></i>
+                                    <span
+                                        class="
+                                            nav-link-icon
+                                            d-md-none
+                                            d-lg-inline-block
+                                        "
+                                    >
+                                        <i
+                                            class="ti {{
+                                                $item['icon']
+                                            }}"
+                                        ></i>
                                     </span>
 
                                     <span class="nav-link-title">
@@ -686,9 +835,12 @@
                                 </a>
                             </li>
                         @endforeach
+
                     @endif
                 @endforeach
+
             </ul>
         </div>
+
     </div>
 </aside>

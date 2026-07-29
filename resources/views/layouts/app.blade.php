@@ -378,6 +378,41 @@ body {
                 padding-right: 1rem !important;
             }
         }
+
+        .sp-brand-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Tema claro
+|--------------------------------------------------------------------------
+*/
+
+.sp-brand-logo-light {
+    display: block;
+}
+
+.sp-brand-logo-dark {
+    display: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Tema oscuro
+|--------------------------------------------------------------------------
+*/
+
+[data-bs-theme="dark"] .sp-brand-logo-light {
+    display: none;
+}
+
+[data-bs-theme="dark"] .sp-brand-logo-dark {
+    display: block;
+}
     </style>
 
     @stack('styles')

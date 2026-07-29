@@ -176,6 +176,20 @@
 
                         <div class="col-12 col-md-auto">
                             <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                                <a
+    href="{{ route(
+        'admin.notices.show',
+        $notice->id
+    ) }}"
+    class="
+        btn
+        btn-outline-info
+        btn-sm
+    "
+>
+    <i class="ti ti-chart-bar me-1"></i>
+    Seguimiento
+</a>
                                 <a href="{{ route('admin.notices.edit', $notice->id) }}" class="btn btn-outline-primary btn-sm">
                                     <i class="ti ti-edit me-1"></i>
                                     Editar

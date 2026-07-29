@@ -26,22 +26,32 @@ class StudentIncidentReportController extends Controller
 ) {
 }
 
-    public function index(Request $request): View
-    {
-        $schoolId = $this->schoolId($request);
-        $filters = $this->filters($request);
+  public function index(Request $request): View
+{
+    $schoolId = $this->schoolId($request);
 
-        $report = $this->buildReport(
-            schoolId: $schoolId,
-            filters: $filters
-        );
+    $filters = $this->filters(
+        $request
+    );
 
-        return view('admin.reports.student-incidents', [
+    $report = $this->buildReport(
+        schoolId: $schoolId,
+        filters: $filters
+    );
+
+    return view(
+        'admin.reports.student-incidents',
+        [
             'filters' => $filters,
-            'groups' => $this->groups($schoolId),
-         $report,
-        ]);
-    }
+
+            'groups' => $this->groups(
+                $schoolId
+            ),
+
+            ...$report,
+        ]
+    );
+}
 
     public function excel(Request $request): BinaryFileResponse
     {
@@ -420,31 +430,35 @@ class StudentIncidentReportController extends Controller
      * Los accesos son eventos reales y se consultan en todo
      * el rango solicitado, exista o no ciclo activo.
      */
-    if ($studentIds !== []) {
-        $accessByStudent = DB::table(
-            'access_logs'
+   if ($studentIds !== []) {
+    $accessByStudent = DB::table(
+        'access_logs'
+    )
+        ->where(
+            'school_id',
+            $schoolId
         )
-            ->where('school_id', $schoolId)
-            ->whereIn(
-                'student_id',
-                $studentIds
-            )
-            ->whereBetween(
-                'scanned_at',
-                [
-                    $requestedFrom,
-                    $requestedTo,
-                ]
-            )
-            ->orderBy('scanned_at')
-            ->get([
-                'student_id',
-                'event_type',
-                'event_status',
-                'scanned_at',
-            ])
-            ->groupBy('student_id');
-    }
+        ->whereIn(
+            'student_id',
+            $studentIds
+        )
+        ->whereBetween(
+            'scanned_at',
+            [
+                $requestedFrom,
+                $requestedTo,
+            ]
+        )
+        ->orderBy('scanned_at')
+        ->get([
+            'student_id',
+            'event_type',
+            'event_status',
+            'decision',
+            'scanned_at',
+        ])
+        ->groupBy('student_id');
+}
 
     /*
      * Solo se generan fechas de clase cuando existe

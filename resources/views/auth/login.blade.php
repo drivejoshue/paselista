@@ -135,7 +135,7 @@
                 class="btn btn-primary btn-lg w-100"
             >
                 <i class="ti ti-login me-2"></i>
-                Entrar a SchoolPass
+                Entrar a PaseLista
             </button>
         </form>
 
