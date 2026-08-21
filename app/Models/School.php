@@ -56,6 +56,22 @@ class School extends Model
         return $this->hasMany(UserDeviceToken::class);
     }
 
+    public function guardianMemberships(): HasMany
+{
+    return $this->hasMany(
+        GuardianMembership::class
+    );
+}
+
+public function familySponsorshipPools(): HasMany
+{
+    return $this->hasMany(
+        SchoolFamilySponsorshipPool::class
+    );
+}
+
+
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');

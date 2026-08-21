@@ -161,7 +161,7 @@
                     ],
 
                     [
-                        'title' => 'Tutores',
+                        'title' => 'Familias',
                         'route' => 'admin.guardians.index',
 
                         'active' => [

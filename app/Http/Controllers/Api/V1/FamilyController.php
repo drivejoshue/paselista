@@ -13,9 +13,9 @@ use Illuminate\Support\Str;
 use App\Services\Attendance\FamilyAttendanceCalendarService;
 
 class FamilyController extends Controller
-{   
-        public function __construct(
-        private readonly FamilyAttendanceCalendarService $attendanceCalendar
+{
+    public function __construct(
+        private readonly FamilyAttendanceCalendarService $attendanceCalendar,
     ) {
     }
 
@@ -29,12 +29,11 @@ class FamilyController extends Controller
             ->where('id', $user->school_id)
             ->first();
 
-            $guardianCredential = DB::table('guardian_credentials')
-    ->where('school_id', $user->school_id)
-    ->where('guardian_id', $guardian->id)
-    ->where('status', 'active')
-    ->latest('id')
-    ->first();
+        $guardianCredential =
+            $this->findActiveGuardianCredential(
+                schoolId: (int) $user->school_id,
+                guardianId: (int) $guardian->id,
+            );
 
         return response()->json([
             'ok' => true,
@@ -75,6 +74,14 @@ class FamilyController extends Controller
     'qr_available' =>
         ! empty($guardian->photo_url)
         && $guardianCredential !== null,
+
+    'photo_required' =>
+        empty($guardian->photo_url),
+
+    'credential_blocked_reason' =>
+        empty($guardian->photo_url)
+            ? 'photo_required'
+            : null,
 ],
             'school' => [
                 'id' => $school?->id,
@@ -179,37 +186,12 @@ class FamilyController extends Controller
                 Storage::disk('public')->delete($previousPhotoPath);
             }
 
-            $credential = DB::table('guardian_credentials')
-                ->where('school_id', $user->school_id)
-                ->where('guardian_id', $currentGuardian->id)
-                ->where('status', 'active')
-                ->latest('id')
-                ->first();
-
-            if (! $credential) {
-              $rawToken = Str::random(64);
-
-                $credentialId = DB::table('guardian_credentials')
-                    ->insertGetId([
-                        'school_id' => $user->school_id,
-                        'guardian_id' => $currentGuardian->id,
-                        'type' => 'qr',
-                        'token_hash' => hash('sha256', $rawToken),
-                        'public_code' => $rawToken,
-                        'status' => 'active',
-                        'issued_at' => now(),
-                        'expires_at' => null,
-                        'revoked_at' => null,
-                        'revoked_reason' => null,
-                        'created_by' => $user->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-
-                $credential = DB::table('guardian_credentials')
-                    ->where('id', $credentialId)
-                    ->first();
-            }
+            $credential =
+                $this->ensureActiveGuardianCredential(
+                    schoolId: (int) $user->school_id,
+                    guardianId: (int) $currentGuardian->id,
+                    createdBy: (int) $user->id,
+                );
 
             return [
                 'photo_path' => '/storage/'.$storedPath,
@@ -267,36 +249,12 @@ public function guardianCredential(Request $request): JsonResponse
         ], 403);
     }
 
-    $credential = DB::table('guardian_credentials')
-        ->where('school_id', $user->school_id)
-        ->where('guardian_id', $guardian->id)
-        ->where('type', 'qr')
-        ->where('status', 'active')
-        ->where(function ($query): void {
-            $query
-                ->whereNull('expires_at')
-                ->orWhere('expires_at', '>', now());
-        })
-        ->latest('id')
-        ->first();
-
-    if (! $credential) {
-        return response()->json([
-            'ok' => false,
-            'status' => 'guardian_credential_not_found',
-            'message' => 'No existe una credencial activa para el tutor.',
-            'guardian' => [
-                'name' => trim(
-                    $guardian->first_name.' '.$guardian->last_name
-                ),
-                'photo_url' => $this->fullUrl(
-                    $guardian->photo_url
-                ),
-                'has_photo' => true,
-                'qr_available' => false,
-            ],
-        ], 404);
-    }
+    $credential =
+        $this->ensureActiveGuardianCredential(
+            schoolId: (int) $user->school_id,
+            guardianId: (int) $guardian->id,
+            createdBy: (int) $user->id,
+        );
 
     return response()->json([
         'ok' => true,
@@ -652,6 +610,81 @@ public function guardianCredential(Request $request): JsonResponse
         }
 
         return Carbon::parse($value)->format('H:i');
+    }
+
+
+    private function findActiveGuardianCredential(
+        int $schoolId,
+        int $guardianId,
+    ): ?object {
+        return DB::table('guardian_credentials')
+            ->where('school_id', $schoolId)
+            ->where('guardian_id', $guardianId)
+            ->where('type', 'qr')
+            ->where('status', 'active')
+            ->where(function ($query): void {
+                $query
+                    ->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->latest('id')
+            ->first();
+    }
+
+    private function ensureActiveGuardianCredential(
+        int $schoolId,
+        int $guardianId,
+        ?int $createdBy = null,
+    ): object {
+        return DB::transaction(
+            function () use (
+                $schoolId,
+                $guardianId,
+                $createdBy,
+            ): object {
+                DB::table('guardians')
+                    ->where('school_id', $schoolId)
+                    ->where('id', $guardianId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $credential =
+                    $this->findActiveGuardianCredential(
+                        schoolId: $schoolId,
+                        guardianId: $guardianId,
+                    );
+
+                if ($credential !== null) {
+                    return $credential;
+                }
+
+                $rawToken = Str::random(64);
+
+                $credentialId =
+                    DB::table('guardian_credentials')
+                        ->insertGetId([
+                            'school_id' => $schoolId,
+                            'guardian_id' => $guardianId,
+                            'type' => 'qr',
+                            'token_hash' =>
+                                hash('sha256', $rawToken),
+                            'public_code' => $rawToken,
+                            'status' => 'active',
+                            'issued_at' => now(),
+                            'expires_at' => null,
+                            'revoked_at' => null,
+                            'revoked_reason' => null,
+                            'created_by' => $createdBy,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+
+                return DB::table('guardian_credentials')
+                    ->where('id', $credentialId)
+                    ->firstOrFail();
+            },
+            3,
+        );
     }
 
 

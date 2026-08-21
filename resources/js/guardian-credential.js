@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import './guardian-show.js';
 
 const renderQrCodes = async () => {
     const containers = document.querySelectorAll('[data-qr-payload]');

@@ -55,6 +55,10 @@ return Application::configure(
 
                 'school.feature' => CheckLicensedFeature::class,
 
+                 'family.access' => (
+            \App\Http\Middleware\EnsureFamilyAnyAccess::class
+        ),
+
                 /*
                 |--------------------------------------------------------------------------
                 | Laravel Sanctum token abilities

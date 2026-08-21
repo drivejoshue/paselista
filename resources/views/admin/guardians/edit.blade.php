@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Editar tutor | PaseLista')
+@section('title', 'Editar responsable | PaseLista')
 @section('section-label', 'Dirección')
-@section('page-title', 'Editar tutor')
+@section('page-title', 'Editar responsable principal')
 
 @section('topbar-actions')
     <a
@@ -10,7 +10,7 @@
         class="btn btn-outline-secondary btn-sm"
     >
         <i class="ti ti-arrow-left me-1"></i>
-        Expediente
+        Núcleo familiar
     </a>
 @endsection
 
@@ -29,7 +29,7 @@
                     <div>
                         <h3 class="card-title">Datos generales</h3>
                         <div class="text-secondary">
-                            Actualiza la información administrativa del tutor.
+                            Actualiza los datos del responsable principal del núcleo familiar.
                         </div>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label required">Estado administrativo</label>
+                            <label class="form-label required">Estado del responsable</label>
                             <select name="status" class="form-select" required>
                                 <option
                                     value="active"
@@ -113,7 +113,7 @@
                             </select>
 
                             <div class="form-hint">
-                                Al dejarlo inactivo o bloqueado se bloquea su cuenta y se revocan sus QR activos.
+                                Al dejarlo inactivo o bloqueado se bloquea su cuenta y se revocan sus QR activos. Los vínculos familiares permanecen registrados.
                             </div>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
 
             <div class="alert alert-warning mt-3">
                 <i class="ti ti-shield-lock me-2"></i>
-                Bloquear el tutor no elimina su expediente ni sus vínculos históricos.
+                Bloquear al responsable no elimina el núcleo, sus alumnos ni los vínculos históricos.
             </div>
         </div>
     </div>

@@ -30,12 +30,15 @@
     ]
   },
   "resources/js/guardian-credential.js": {
-    "file": "assets/guardian-credential-BFllnW6g.js",
+    "file": "assets/guardian-credential-CbvyWqsW.js",
     "name": "guardian-credential",
     "src": "resources/js/guardian-credential.js",
     "isEntry": true,
     "imports": [
       "_browser-BeMEBtOm.js"
+    ],
+    "css": [
+      "assets/guardian-credential-BSxcChcp.css"
     ]
   }
 }

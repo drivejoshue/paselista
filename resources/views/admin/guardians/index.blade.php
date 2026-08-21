@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Tutores | PaseLista')
+@section('title', 'Familias | PaseLista')
 @section('section-label', 'Dirección')
-@section('page-title', 'Tutores')
+@section('page-title', 'Núcleos familiares')
 
 @section('topbar-actions')
     <a href="{{ route('admin.guardians.create') }}" class="btn btn-primary btn-sm">
-        <i class="ti ti-user-plus me-1"></i>
-        Nuevo tutor
+        <i class="ti ti-home-plus me-1"></i>
+        Nuevo núcleo familiar
     </a>
 @endsection
 
@@ -26,12 +26,25 @@
         </div>
     @endif
 
+    <div class="alert alert-info">
+        <div class="d-flex">
+            <div><i class="ti ti-users-group icon alert-icon"></i></div>
+            <div>
+                <h4 class="alert-title">Un núcleo se administra desde su responsable principal</h4>
+                <div class="text-secondary">
+                    La membresía cubre a todos los alumnos donde esta persona es principal.
+                    Padres secundarios, familiares y autorizados se agregan dentro del expediente del núcleo.
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <div>
-                <h3 class="card-title">Tutores registrados</h3>
+                <h3 class="card-title">Núcleos familiares registrados</h3>
                 <p class="card-subtitle">
-                    Padres, tutores y personas autorizadas vinculadas a alumnos.
+                    Se muestran únicamente responsables principales con alumnos activos.
                 </p>
             </div>
         </div>
@@ -40,15 +53,13 @@
             <form method="GET" action="{{ route('admin.guardians.index') }}" class="row g-2">
                 <div class="col-lg-5">
                     <div class="input-icon">
-                        <span class="input-icon-addon">
-                            <i class="ti ti-search"></i>
-                        </span>
+                        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
                         <input
                             type="text"
                             name="search"
                             value="{{ $filters['search'] }}"
                             class="form-control"
-                            placeholder="Nombre, correo, teléfono o usuario"
+                            placeholder="Responsable, alumno, correo, teléfono o matrícula"
                         >
                     </div>
                 </div>
@@ -99,12 +110,11 @@
             <table class="table table-vcenter card-table">
                 <thead>
                     <tr>
-                        <th>Tutor</th>
-                        <th>Contacto</th>
-                        <th>Cuenta Family</th>
-                        <th>Alumnos</th>
-                        <th>QR</th>
-                        <th>Último movimiento</th>
+                        <th>Responsable principal</th>
+                        <th>Alumnos del núcleo</th>
+                        <th>Familiares y autorizados</th>
+                        <th>PaseLista Family</th>
+                        <th>Cuenta / QR</th>
                         <th>Estado</th>
                         <th class="w-1"></th>
                     </tr>
@@ -113,6 +123,35 @@
                     @forelse($guardians as $guardian)
                         @php
                             $fullName = trim($guardian->first_name.' '.$guardian->last_name);
+                            $membershipUsable = $guardian->membership_status === 'active'
+                                && (
+                                    empty($guardian->membership_expires_at)
+                                    || \Illuminate\Support\Carbon::parse(
+                                        $guardian->membership_expires_at
+                                    )->endOfDay()->gte(now())
+                                );
+
+                            $familyLabel = 'Pendiente de activación';
+                            $familyClass = 'bg-warning-lt';
+
+                            if ($familyTrialActive) {
+                                $familyLabel = 'Prueba institucional';
+                                $familyClass = 'bg-azure-lt';
+                            } elseif ($membershipUsable) {
+                                $familyLabel = match ($guardian->membership_source) {
+                                    'school_sponsorship' => 'Patrocinada',
+                                    'google_play' => 'Pagada',
+                                    'sysadmin_courtesy' => 'Cortesía',
+                                    default => 'Activa',
+                                };
+                                $familyClass = 'bg-success-lt';
+                            } elseif($guardian->membership_status === 'revoked') {
+                                $familyLabel = 'Revocada';
+                                $familyClass = 'bg-danger-lt';
+                            } elseif($guardian->membership_status === 'expired') {
+                                $familyLabel = 'Vencida';
+                                $familyClass = 'bg-secondary-lt';
+                            }
                         @endphp
 
                         <tr>
@@ -136,59 +175,61 @@
                                         >
                                             {{ $fullName }}
                                         </a>
-
-                                        @if((int) $guardian->primary_students_count > 0)
-                                            <div class="text-secondary small">
-                                                Principal de {{ $guardian->primary_students_count }}
-                                            </div>
-                                        @endif
+                                        <div class="text-secondary small">
+                                            Responsable principal · {{ $guardian->phone ?? 'Sin teléfono' }}
+                                        </div>
+                                        <div class="text-secondary small text-break">
+                                            {{ $guardian->email ?? 'Sin correo' }}
+                                        </div>
                                     </div>
                                 </div>
                             </td>
 
                             <td>
-                                <div>{{ $guardian->phone ?? 'Sin teléfono' }}</div>
-                                <div class="text-secondary small">
-                                    {{ $guardian->email ?? 'Sin correo' }}
+                                <span class="badge bg-blue-lt mb-1">
+                                    {{ $guardian->primary_students_count }} alumno(s)
+                                </span>
+                                <div class="text-secondary small" style="max-width: 310px;">
+                                    {{ $guardian->primary_students_names ?: 'Sin nombres disponibles' }}
                                 </div>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-purple-lt">
+                                    {{ $guardian->family_members_count }} miembro(s)
+                                </span>
+                                <div class="text-secondary small mt-1">
+                                    Secundarios y personas autorizadas
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="badge {{ $familyClass }}">{{ $familyLabel }}</span>
+                                @if($membershipUsable && $guardian->membership_expires_at)
+                                    <div class="text-secondary small mt-1">
+                                        Hasta {{ \Illuminate\Support\Carbon::parse($guardian->membership_expires_at)->format('d/m/Y') }}
+                                    </div>
+                                @endif
                             </td>
 
                             <td>
                                 @if($guardian->user_id)
                                     <span class="badge {{ $guardian->user_status === 'active' ? 'bg-success-lt' : 'bg-danger-lt' }}">
-                                        {{ $guardian->user_status === 'active' ? 'Activa' : 'Bloqueada' }}
+                                        App {{ $guardian->user_status === 'active' ? 'activa' : 'bloqueada' }}
                                     </span>
-                                    <div class="text-secondary small text-break mt-1">
-                                        {{ $guardian->access_username }}
-                                    </div>
                                 @else
-                                    <span class="badge bg-secondary-lt">Sin acceso</span>
+                                    <span class="badge bg-secondary-lt">Sin cuenta</span>
                                 @endif
-                            </td>
 
-                            <td>
-                                <span class="badge bg-blue-lt">
-                                    {{ $guardian->students_count }} vinculados
-                                </span>
-                            </td>
-
-                            <td>
-                                @if((int) $guardian->active_credentials_count > 0)
-                                    <span class="badge bg-green-lt">
-                                        <i class="ti ti-qrcode me-1"></i>
-                                        Activo
-                                    </span>
-                                @elseif(!$guardian->photo_url)
-                                    <span class="badge bg-yellow-lt">Requiere foto</span>
-                                @else
-                                    <span class="badge bg-secondary-lt">Sin QR</span>
-                                @endif
-                            </td>
-
-                            <td>
-                                {{ $guardian->last_access_at
-                                    ? \Illuminate\Support\Carbon::parse($guardian->last_access_at)->format('d/m/Y H:i')
-                                    : 'Sin movimientos' }}
+                                <div class="mt-1">
+                                    @if((int) $guardian->active_credentials_count > 0)
+                                        <span class="badge bg-green-lt"><i class="ti ti-qrcode me-1"></i>QR activo</span>
+                                    @elseif(!$guardian->photo_url)
+                                        <span class="badge bg-yellow-lt">QR requiere foto</span>
+                                    @else
+                                        <span class="badge bg-secondary-lt">Sin QR</span>
+                                    @endif
+                                </div>
                             </td>
 
                             <td>
@@ -205,15 +246,14 @@
                                 <div class="btn-list flex-nowrap">
                                     <a
                                         href="{{ route('admin.guardians.show', $guardian->id) }}"
-                                        class="btn btn-sm btn-outline-primary"
+                                        class="btn btn-sm btn-primary"
                                     >
-                                        Ver
+                                        Abrir núcleo
                                     </a>
-
                                     <a
                                         href="{{ route('admin.guardians.edit', $guardian->id) }}"
                                         class="btn btn-sm btn-outline-secondary"
-                                        title="Editar tutor"
+                                        title="Editar responsable"
                                     >
                                         <i class="ti ti-edit"></i>
                                     </a>
@@ -222,8 +262,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-secondary py-5">
-                                No hay tutores que coincidan con los filtros.
+                            <td colspan="7" class="text-center text-secondary py-5">
+                                No hay núcleos familiares que coincidan con los filtros.
                             </td>
                         </tr>
                     @endforelse
@@ -232,9 +272,7 @@
         </div>
 
         @if($guardians->hasPages())
-            <div class="card-footer">
-                {{ $guardians->links() }}
-            </div>
+            <div class="card-footer">{{ $guardians->links() }}</div>
         @endif
     </div>
 @endsection

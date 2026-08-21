@@ -15,7 +15,7 @@
 
 /.idea/
 /.vscode/
-
+/storage/app/private/google-play-service-account.json
 
 *.sql
 *.sql.gz

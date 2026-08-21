@@ -24,7 +24,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 | Administración
 |--------------------------------------------------------------------------
 */
-
+use App\Http\Controllers\Admin\FamilySponsorshipController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\GuardianController;
@@ -540,6 +540,53 @@ Route::patch(
 )
     ->whereNumber('guardian')
     ->name('guardians.account.status');
+
+
+
+    Route::get(
+    '/family-sponsorships/summary',
+    [
+        FamilySponsorshipController::class,
+        'summary',
+    ]
+)->name(
+    'family-sponsorships.summary'
+);
+
+Route::post(
+    '/guardians/{guardian}/family-sponsorship',
+    [
+        FamilySponsorshipController::class,
+        'store',
+    ]
+)
+    ->whereNumber('guardian')
+    ->name(
+        'guardians.family-sponsorship.store'
+    );
+
+
+    Route::patch(
+    '/guardians/{guardian}/students/transfer',
+    [GuardianController::class, 'transferPrimaryStudent']
+)
+    ->whereNumber('guardian')
+    ->name('guardians.students.transfer');
+
+Route::post(
+    '/guardians/{guardian}/members',
+    [GuardianController::class, 'storeFamilyMember']
+)
+    ->whereNumber('guardian')
+    ->name('guardians.members.store');
+
+Route::patch(
+    '/guardians/{guardian}/members/{member}/unlink',
+    [GuardianController::class, 'unlinkFamilyMember']
+)
+    ->whereNumber('guardian')
+    ->whereNumber('member')
+    ->name('guardians.members.unlink');
 
 
         /*
