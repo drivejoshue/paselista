@@ -52,7 +52,7 @@ return new class extends Migration
                         THEN school_id
                         ELSE NULL
                     END
-                ) STORED
+                ) VIRTUAL
                 "
             );
         }

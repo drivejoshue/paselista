@@ -53,7 +53,7 @@ return new class extends Migration
                         THEN student_id
                         ELSE NULL
                     END
-                ) STORED
+                ) VIRTUAL
                 "
             );
         }
