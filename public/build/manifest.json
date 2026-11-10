@@ -103,6 +103,19 @@
       "assets/guardian-credential-BSxcChcp.css"
     ]
   },
+  "resources/js/paselista/paselista-landing.tsx": {
+    "file": "assets/paselista-landing-BiJfPjNn.js",
+    "name": "paselista-landing",
+    "src": "resources/js/paselista/paselista-landing.tsx",
+    "isEntry": true,
+    "imports": [
+      "_index-CQYDk2Bs.js",
+      "__commonjsHelpers-CqkleIqs.js"
+    ],
+    "css": [
+      "assets/paselista-landing-Calpsn3t.css"
+    ]
+  },
   "resources/js/schoolcore-public/main.tsx": {
     "file": "assets/main-yfw0urkd.js",
     "name": "main",

@@ -17,6 +17,7 @@ export default defineConfig({
                 'resources/js/teacher/main.tsx',
                 'resources/js/grade-portal/main.tsx',
                 'resources/js/schoolcore-public/main.tsx',
+                'resources/js/paselista/paselista-landing.tsx',
             ],
             refresh: true,
         }),

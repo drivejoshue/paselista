@@ -108,7 +108,7 @@ Route::view(
 
 Route::view(
     '/modulos/paselista',
-    'public.paselista'
+    'public.paselista-react'
 )->name('public.paselista');
 
 
