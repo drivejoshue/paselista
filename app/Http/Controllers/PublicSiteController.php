@@ -8,7 +8,7 @@ class PublicSiteController extends Controller
 {
     public function home(): View
     {
-        return view('public.home');
+        return view('public.schoolcore-home');
     }
 
     public function privacy(): View

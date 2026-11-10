@@ -74,6 +74,14 @@
 </a>
 
 <a
+    href="{{ route('sysadmin.schools.modules.index', ['school' => request()->route('school')]) }}"
+    class="btn btn-primary"
+>
+    <i class="ti ti-packages me-1"></i>
+    Plan y módulos SchoolCore
+</a>
+
+<a
     href="{{ route(
         'sysadmin.schools.app-config.edit',
         $schoolData

@@ -53,6 +53,8 @@ return Application::configure(
 
                 'school.license' => EnsureSchoolLicense::class,
 
+                'school.module' => \App\Http\Middleware\EnsureSchoolModule::class,
+
                 'school.feature' => CheckLicensedFeature::class,
 
                  'family.access' => (

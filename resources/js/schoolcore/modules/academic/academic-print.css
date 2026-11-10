@@ -1,0 +1,39 @@
+/* Botonera contextual; distinta visualmente del header principal. */
+.academic-module .academic-tool-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    min-height: 2.25rem;
+    padding: 0 .6rem;
+    border: 1px solid rgb(203 213 225);
+    border-radius: .5rem;
+    background: white;
+    color: #334155;
+    font-size: .75rem;
+    font-weight: 600;
+    transition: border-color .15s, background-color .15s;
+}
+.academic-module .academic-tool-button:hover:not(:disabled) {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+.academic-module .academic-tool-button:disabled { opacity: .42; cursor: not-allowed; }
+.dark .academic-module .academic-tool-button {
+    background: #0f172a;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+.dark .academic-module .academic-tool-button:hover:not(:disabled) { background: #1e293b; }
+@media print {
+    html, body { height: auto !important; overflow: visible !important; background: white !important; color: black !important; }
+    main, .h-dvh { height: auto !important; overflow: visible !important; }
+    .academic-hide-print, nav, aside, header { display: none !important; }
+    .academic-module { margin: 0 !important; padding: 0 !important; color: black !important; }
+    .academic-module .academic-print-heading { display: block !important; margin-bottom: 16px; }
+    .academic-module .academic-print-heading h1 { font-size: 20pt; font-weight: 700; }
+    .academic-module .academic-print-heading p { font-size: 10pt; }
+    .academic-module table { width: 100%; border-collapse: collapse; }
+    .academic-module td, .academic-module th { border: 1px solid #999; padding: 6px; }
+    @page { size: A4 landscape; margin: 12mm; }
+}

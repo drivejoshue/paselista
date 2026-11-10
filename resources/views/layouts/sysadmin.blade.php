@@ -382,6 +382,27 @@
     </li>
 
 
+<li class="nav-item">
+    <a
+        href="{{ route('sysadmin.modules.index') }}"
+        class="nav-link {{
+            request()->routeIs('sysadmin.modules.*')
+                ? 'active'
+                : ''
+        }}"
+    >
+        <span class="nav-link-icon d-md-none d-lg-inline-block">
+            <i class="ti ti-packages"></i>
+        </span>
+
+        <span class="nav-link-title">
+            Marketplace de módulos
+        </span>
+    </a>
+</li>
+
+
+
       {{-- =========================================================
          INTELIGENCIA ARTIFICIAL
     ========================================================== --}}

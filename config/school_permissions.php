@@ -71,6 +71,23 @@ return [
             ],
         ],
 
+
+        'schoolcore.dashboard.view' => [
+            'label' => 'Acceder a SchoolCore',
+            'group' => 'SchoolCore',
+            'description' =>
+                'Acceso al panel general de la plataforma escolar.',
+            'roles' => [
+                'school_admin',
+                'director',
+            ],
+            'methods' => ['GET', 'HEAD'],
+            'routes' => [
+                'admin.schoolcore.index',
+            ],
+        ],
+
+
         'dashboard.view' => [
             'label' => 'Dashboard escolar',
             'group' => 'Consulta',
@@ -306,6 +323,72 @@ return [
                 'admin.tools.*',
             ],
         ],
+
+        'academic_catalog_read' => [
+    'label' => 'Consultar organización académica',
+    'group' => 'Academic',
+    'description' => 'Consulta de planes, materias y docentes.',
+    'roles' => ['director'],
+    'routes' => [
+        'admin.schoolcore.academic.catalog.index',
+    ],
+    'methods' => ['GET'],
+],
+
+'academic_catalog_manage' => [
+    'label' => 'Administrar planes y materias',
+    'group' => 'Academic',
+    'description' => 'Registro de planes y materias.',
+    'roles' => ['director'],
+    'routes' => [
+        'admin.schoolcore.academic.catalog.plans.store',
+        'admin.schoolcore.academic.catalog.plans.subjects.store',
+        'admin.schoolcore.academic.catalog.subjects.store',
+    ],
+    'methods' => ['POST'],
+],
+'academic_catalog_read' => [
+    'label' => 'Consultar organización académica',
+    'group' => 'Academic',
+    'description' => 'Consultar planes, materias, docentes y grupos.',
+    'roles' => ['director'],
+    'routes' => [
+        'admin.schoolcore.academic.catalog.index',
+        'admin.schoolcore.academic.groups.index',
+    ],
+    'methods' => ['GET'],
+],
+'academic_teachers_manage' => [
+    'label' => 'Registrar docentes de Academic',
+    'group' => 'Academic',
+    'description' => 'Crear cuentas y perfiles docentes desde Dirección.',
+    'roles' => ['director'],
+    'routes' => [
+        'admin.schoolcore.academic.catalog.teachers.store',
+    ],
+    'methods' => ['POST'],
+],
+
+'academic_teacher_credentials' => [
+    'label' => 'Gestionar credenciales docentes',
+    'group' => 'Academic',
+    'description' => 'Restablecer acceso docente desde Dirección',
+    'roles' => ['director'],
+    'routes' => [
+        'admin.schoolcore.academic.catalog.teachers.password',
+    ],
+    'methods' => ['POST'],
+],
+
+'academic_group_assignments_manage' => [
+    'label' => 'Asignar docentes a grupos y materias',
+    'group' => 'Academic',
+    'description' => 'Gestiona docentes responsables por grupo, grado, ciclo y materia.',
+    'roles' => ['director'],
+    'routes' => ['admin.schoolcore.academic.groups.assign'],
+    'methods' => ['POST'],
+],
+
     ],
 
     /*

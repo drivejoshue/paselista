@@ -86,31 +86,31 @@ use App\Http\Controllers\Admin\Ai\AiSettingsController;
 use App\Http\Middleware\EnsureAiAccess;
 
 
+
+
+
+
 /*
 |--------------------------------------------------------------------------
-| Inicio
+| Web pública SchoolCore
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    if (! auth()->check()) {
-        return redirect()->route('login');
-    }
+Route::view(
+    '/',
+    'public.schoolcore-home'
+)->name('home');
 
-  return match (auth()->user()->role) {
-    'superadmin' => redirect()->route('sysadmin.dashboard'),
+Route::view(
+    '/schoolcore',
+    'public.schoolcore-home'
+)->name('public.schoolcore');
 
-    'school_admin',
-    'director' => redirect()->route('admin.dashboard'),
+Route::view(
+    '/modulos/paselista',
+    'public.paselista'
+)->name('public.paselista');
 
-        'prefect' => redirect()->route('prefect.access'),
-        'guardian' => redirect()->route('guardian.home'),
-        'student' => redirect()->route('student.home'),
-        'kiosk' => redirect()->route('kiosk.access'),
-
-        default => abort(403),
-    };
-})->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -346,7 +346,7 @@ Route::patch(
 
 
 
-    
+
         /*
         |--------------------------------------------------------------------------
         | Alumnos
@@ -1341,10 +1341,59 @@ Route::get(
 
 
 
+//////////////////////////core
 
-require __DIR__.'/ai-admin.php';
-require __DIR__.'/school-permissions.php';
+
+
+
+
+
+
+Route::middleware([
+    'auth',
+    'role:school_admin,director',
+    'school.license',
+])
+    ->get(
+        '/admin/schoolcore',
+        [
+            \App\Http\Controllers\SchoolCore\DashboardController::class,
+            'index',
+        ]
+    )
+    ->name('admin.schoolcore.index');
+
+
+
+
+
+Route::patch(
+    '/admin/schoolcore/modules/{code}',
+    [
+        \App\Http\Controllers\SchoolCore\FreeModuleController::class,
+        'update',
+    ]
+)
+    ->middleware([
+        'auth',
+        'role:school_admin',
+        'school.license',
+    ])
+    ->where('code', '[a-z][a-z0-9_]*')
+    ->name('admin.schoolcore.modules.update');
+
+
+
+require __DIR__ . '/academic_grade_exports.php';
+   require __DIR__.'/academic_grade_workflow.php';
+require __DIR__ . '/academic_plan_manager.php';
+require __DIR__.'/academic_teacher_access.php';
+    require __DIR__.'/academic_groups.php';
+    require __DIR__.'/academic_catalog.php';
+    require __DIR__.'/modules/academic.php';
+    require __DIR__.'/ai-admin.php';
+    require __DIR__.'/school-permissions.php';
     require __DIR__.'/sysadmin.php';
     require __DIR__.'/sysadmin-ai.php';
-
+require __DIR__ . '/academic_grade_portal.php';
     require __DIR__.'/public-site.php';

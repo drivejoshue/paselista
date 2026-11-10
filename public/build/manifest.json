@@ -1,7 +1,53 @@
 {
-  "_browser-BeMEBtOm.js": {
-    "file": "assets/browser-BeMEBtOm.js",
-    "name": "browser"
+  "__commonjsHelpers-CqkleIqs.js": {
+    "file": "assets/_commonjsHelpers-CqkleIqs.js",
+    "name": "_commonjsHelpers"
+  },
+  "_browser-ChiR9Dcd.js": {
+    "file": "assets/browser-ChiR9Dcd.js",
+    "name": "browser",
+    "imports": [
+      "__commonjsHelpers-CqkleIqs.js"
+    ]
+  },
+  "_index-CQYDk2Bs.js": {
+    "file": "assets/index-CQYDk2Bs.js",
+    "name": "index",
+    "imports": [
+      "__commonjsHelpers-CqkleIqs.js"
+    ]
+  },
+  "_schoolcore-B90IwrQu.js": {
+    "file": "assets/schoolcore-B90IwrQu.js",
+    "name": "schoolcore",
+    "imports": [
+      "_x-DtJJ_db8.js"
+    ],
+    "css": [
+      "assets/schoolcore-CEy1yfgC.css"
+    ]
+  },
+  "_schoolcore-CEy1yfgC.css": {
+    "file": "assets/schoolcore-CEy1yfgC.css",
+    "src": "_schoolcore-CEy1yfgC.css"
+  },
+  "_sweetalert2.esm.all-0Z_61IYw.js": {
+    "file": "assets/sweetalert2.esm.all-0Z_61IYw.js",
+    "name": "sweetalert2.esm.all"
+  },
+  "_users-round-BaKAlTOZ.js": {
+    "file": "assets/users-round-BaKAlTOZ.js",
+    "name": "users-round",
+    "imports": [
+      "_x-DtJJ_db8.js"
+    ]
+  },
+  "_x-DtJJ_db8.js": {
+    "file": "assets/x-DtJJ_db8.js",
+    "name": "x",
+    "imports": [
+      "_index-CQYDk2Bs.js"
+    ]
   },
   "node_modules/@tabler/icons-webfont/dist/fonts/tabler-icons.ttf": {
     "file": "assets/tabler-icons-DSK2_1ka.ttf",
@@ -21,24 +67,82 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-B0WXKGq8.js",
+    "file": "assets/app-CiAvTSVt.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_browser-BeMEBtOm.js"
+      "_browser-ChiR9Dcd.js",
+      "__commonjsHelpers-CqkleIqs.js"
+    ]
+  },
+  "resources/js/grade-portal/main.tsx": {
+    "file": "assets/main-DKQk1x3P.js",
+    "name": "main",
+    "src": "resources/js/grade-portal/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_index-CQYDk2Bs.js",
+      "__commonjsHelpers-CqkleIqs.js"
+    ],
+    "css": [
+      "assets/main-VN1hB8n7.css"
     ]
   },
   "resources/js/guardian-credential.js": {
-    "file": "assets/guardian-credential-CbvyWqsW.js",
+    "file": "assets/guardian-credential-DJK8l9PK.js",
     "name": "guardian-credential",
     "src": "resources/js/guardian-credential.js",
     "isEntry": true,
     "imports": [
-      "_browser-BeMEBtOm.js"
+      "_browser-ChiR9Dcd.js",
+      "_sweetalert2.esm.all-0Z_61IYw.js",
+      "__commonjsHelpers-CqkleIqs.js"
     ],
     "css": [
       "assets/guardian-credential-BSxcChcp.css"
+    ]
+  },
+  "resources/js/schoolcore-public/main.tsx": {
+    "file": "assets/main-yfw0urkd.js",
+    "name": "main",
+    "src": "resources/js/schoolcore-public/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_index-CQYDk2Bs.js",
+      "_users-round-BaKAlTOZ.js",
+      "_x-DtJJ_db8.js",
+      "__commonjsHelpers-CqkleIqs.js"
+    ],
+    "css": [
+      "assets/main-BX1zvvUj.css"
+    ]
+  },
+  "resources/js/schoolcore/main.tsx": {
+    "file": "assets/main-CpBPiV65.js",
+    "name": "main",
+    "src": "resources/js/schoolcore/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_index-CQYDk2Bs.js",
+      "_sweetalert2.esm.all-0Z_61IYw.js",
+      "_x-DtJJ_db8.js",
+      "_schoolcore-B90IwrQu.js",
+      "_users-round-BaKAlTOZ.js",
+      "__commonjsHelpers-CqkleIqs.js"
+    ]
+  },
+  "resources/js/teacher/main.tsx": {
+    "file": "assets/main-BtR8lhRa.js",
+    "name": "main",
+    "src": "resources/js/teacher/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_index-CQYDk2Bs.js",
+      "_sweetalert2.esm.all-0Z_61IYw.js",
+      "_schoolcore-B90IwrQu.js",
+      "_x-DtJJ_db8.js",
+      "__commonjsHelpers-CqkleIqs.js"
     ]
   }
 }

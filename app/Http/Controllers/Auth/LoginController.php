@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
@@ -25,16 +26,17 @@ class LoginController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ]);
 
         $remember = $request->boolean('remember');
 
+        $login = mb_strtolower(trim($credentials['email']));
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
         $authenticated = Auth::attempt([
-            'email' => mb_strtolower(
-                trim($credentials['email'])
-            ),
+            $field => $login,
             'password' => $credentials['password'],
             'status' => 'active',
         ], $remember);
@@ -67,25 +69,40 @@ class LoginController extends Controller
         return redirect()->route('login');
     }
 
-    private function redirectAuthenticatedUser(
-        User $user
-    ): RedirectResponse {
-        return match ($user->role) {
-            'superadmin' => redirect()
-                ->route('sysadmin.dashboard'),
 
-            'school_admin',
-            'director' => redirect()
-                ->route('admin.dashboard'),
-
-            'guardian' => redirect()
-                ->route('guardian.home'),
-
-            'student' => redirect()
-                ->route('student.home'),
-
-            default => redirect()
-                ->route('home'),
-        };
+private function redirectAuthenticatedUser(
+    User $user
+): RedirectResponse {
+    // Docentes: conservan su portal y
+    // el cambio obligatorio de contraseña.
+    if ($user->role === 'teacher') {
+        return redirect()->route(
+            $user->must_change_password
+                ? 'teacher.password.change'
+                : 'teacher.dashboard'
+        );
     }
+
+    return match ($user->role) {
+        // Administración general del sistema.
+        'superadmin' => redirect()
+            ->route('sysadmin.dashboard'),
+
+        // Administración y dirección escolar.
+        'school_admin',
+        'director' => redirect()
+            ->to('/admin/schoolcore'),
+
+        // Portales especializados.
+        'guardian' => redirect()
+            ->route('guardian.home'),
+
+        'student' => redirect()
+            ->route('student.home'),
+
+        default => redirect()
+            ->route('home'),
+    };
+}
+
 }

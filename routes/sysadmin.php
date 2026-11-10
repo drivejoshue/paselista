@@ -167,6 +167,60 @@ Route::middleware([
             ->name('schools.support.impersonate');
 
 
+
+Route::get(
+    '/modules',
+    [
+        \App\Http\Controllers\Sysadmin\ModuleCatalogController::class,
+        'index',
+    ]
+)->name('modules.index');
+
+Route::put(
+    '/modules/{module}',
+    [
+        \App\Http\Controllers\Sysadmin\ModuleCatalogController::class,
+        'update',
+    ]
+)
+    ->whereNumber('module')
+    ->name('modules.update');
+
+
+Route::get(
+    '/schools/{school}/modules',
+    [
+        \App\Http\Controllers\Sysadmin\SchoolModulesController::class,
+        'index',
+    ]
+)
+    ->whereNumber('school')
+    ->name('schools.modules.index');
+
+Route::post(
+    '/schools/{school}/contracts',
+    [
+        \App\Http\Controllers\Sysadmin\SchoolModulesController::class,
+        'storeContract',
+    ]
+)
+    ->whereNumber('school')
+    ->name('schools.contracts.store');
+
+Route::put(
+    '/schools/{school}/modules/{module}',
+    [
+        \App\Http\Controllers\Sysadmin\SchoolModulesController::class,
+        'updateModule',
+    ]
+)
+    ->whereNumber('school')
+    ->whereNumber('module')
+    ->name('schools.modules.update');
+
+
+
+
 Route::get(
     '/mobile-app-versions',
     [

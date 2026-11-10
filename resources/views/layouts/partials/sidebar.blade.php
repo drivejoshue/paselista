@@ -674,6 +674,78 @@
             ],
         ];
     }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PaseLista V2 - Navegación exclusiva del módulo
+    |--------------------------------------------------------------------------
+    | Las funciones comunes se administran desde SchoolCore.
+    | No se eliminan rutas, controladores ni permisos.
+    */
+
+    if (in_array($role, $schoolManagementRoles, true)) {
+        $attendanceRoutes = [
+            'admin.dashboard',
+            'prefect.access',
+            'kiosk.access',
+            'admin.direction-live.index',
+            'admin.reports.attendance',
+            'admin.credentials.index',
+            'admin.areas.index',
+            'admin.area-rules.index',
+            'admin.devices.index',
+            'admin.reports.access',
+            'admin.reports.monthly-attendance.index',
+            'admin.reports.student-individual.index',
+            'admin.reports.student-incidents.index',
+            'admin.reports.analytics.index',
+            'admin.reports.exports.index',
+            'admin.reports.export-audit.index',
+            'admin.ai.index',
+        ];
+
+        $sections = collect($sections)
+            ->map(function (array $section) use ($attendanceRoutes): array {
+                $section['items'] = collect($section['items'])
+                    ->filter(
+                        fn (array $item): bool => in_array(
+                            $item['route'],
+                            $attendanceRoutes,
+                            true
+                        )
+                    )
+                    ->values()
+                    ->all();
+
+                return $section;
+            })
+            ->filter(
+                fn (array $section): bool =>
+                    count($section['items']) > 0
+            )
+            ->values()
+            ->all();
+
+        array_unshift($sections, [
+            'label' => 'Plataforma',
+            'items' => [
+                [
+                    'title' => 'Volver a SchoolCore',
+                    'route' => 'admin.schoolcore.index',
+                    'active' => ['admin.schoolcore.*'],
+                    'icon' => 'ti-arrow-left',
+                    'roles' => $schoolManagementRoles,
+                ],
+            ],
+        ]);
+    }
+
+
+
+
+
 @endphp
 
 <aside
